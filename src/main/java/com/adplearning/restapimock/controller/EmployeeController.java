@@ -1,5 +1,6 @@
 package com.adplearning.restapimock.controller;
 
+import com.adplearning.restapimock.error.ElementNotFound;
 import com.adplearning.restapimock.model.Employee;
 import com.adplearning.restapimock.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,13 @@ public class EmployeeController {
     }
 
     @RequestMapping(method=RequestMethod.GET, value="/employees/{id}")
-    public Employee show(@PathVariable Integer id) {
-        return employeeRepository.findOne(id);
+    public Employee show(@PathVariable Integer id) throws ElementNotFound {
+        Employee result = employeeRepository.findOne(id);
+
+        if ((result = employeeRepository.findOne(id)) == null)
+            throw new ElementNotFound();
+
+        return result;
     }
 
     @RequestMapping(method=RequestMethod.PUT, value="/employees/{id}")

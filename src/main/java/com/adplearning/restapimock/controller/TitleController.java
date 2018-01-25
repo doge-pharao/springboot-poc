@@ -22,14 +22,14 @@ public class TitleController {
     EmployeeRepository employeeRepository;
 
     @RequestMapping(method=RequestMethod.GET, value="/employees/{employeeNumber}/titles")
-    public Iterator<Title> show(@PathVariable Integer employeeNumber) {
+    public Iterator<Title> show(@PathVariable Integer employeeNumber) throws ElementNotFound {
         Employee employee;
         Iterator<Title> results;
 
         if (null != (employee = employeeRepository.findOne(employeeNumber)))
             results = employee.getTitles().iterator();
         else
-            results = Collections.<Title>emptyIterator();
+            throw new ElementNotFound();
 
         return results;
     }
