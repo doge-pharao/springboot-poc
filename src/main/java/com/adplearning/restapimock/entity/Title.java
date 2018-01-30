@@ -1,6 +1,4 @@
-package com.adplearning.restapimock.model;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+package com.adplearning.restapimock.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "titles")
-public class Title {
+public class Title implements Serializable {
 
     @EmbeddedId
     private TitlePK id;

@@ -1,9 +1,8 @@
-package com.adplearning.restapimock.controller;
+package com.adplearning.restapimock.controller.title;
 
 import com.adplearning.restapimock.error.ElementNotFound;
-import com.adplearning.restapimock.error.ErrorResponse;
-import com.adplearning.restapimock.model.Employee;
-import com.adplearning.restapimock.model.Title;
+import com.adplearning.restapimock.entity.Employee;
+import com.adplearning.restapimock.entity.Title;
 import com.adplearning.restapimock.repository.EmployeeRepository;
 import com.adplearning.restapimock.repository.TitleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @RestController
+@RequestMapping(value = "/employees")
 public class TitleController {
 
     @Autowired
@@ -21,20 +21,20 @@ public class TitleController {
     @Autowired
     EmployeeRepository employeeRepository;
 
-    @RequestMapping(method=RequestMethod.GET, value="/employees/{employeeNumber}/titles")
-    public Iterator<Title> show(@PathVariable Integer employeeNumber) throws ElementNotFound {
+    @RequestMapping(method = RequestMethod.GET, value = "/{employeeNumber}/titles")
+    public List<Title> getAllTitles(@PathVariable Integer employeeNumber) {
         Employee employee;
-        Iterator<Title> results;
+        List<Title> results;
 
-        if (null != (employee = employeeRepository.findOne(employeeNumber)))
-            results = employee.getTitles().iterator();
+        if (employeeRepository.findOne(employeeNumber) != null)
+            results = titleRepository.findByIdEmployeeNumber(employeeNumber);
         else
-            throw new ElementNotFound();
+            results = Collections.emptyList();
 
         return results;
     }
 
-    @RequestMapping(method=RequestMethod.GET, value="/employees/{employeeNumber}/titles/{title:[a-zA-Z 0-9]*}")
+    @RequestMapping(method = RequestMethod.GET, value = "/{employeeNumber}/titles/{title:[a-zA-Z 0-9]*}")
     public List<Title> show(@PathVariable("employeeNumber") Integer employeeNumber, @PathVariable("title") String title) {
         List<Title> results = titleRepository.findByIdEmployeeNumberAndIdTitle(employeeNumber, title);
 
@@ -44,15 +44,15 @@ public class TitleController {
         return results;
     }
 
-    @RequestMapping(method=RequestMethod.GET,
-            value= "/employees/{employeeNumber}/titles", params = { "fromDate" })
+    @RequestMapping(method = RequestMethod.GET,
+            value = "/{employeeNumber}/titles", params = {"fromDate"})
     public List<Title> show(@PathVariable("employeeNumber") Integer employeeNumber,
-                                @RequestParam("fromDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
-                                @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Optional<Date> endDate) throws ElementNotFound {
+                            @RequestParam("fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+                            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> endDate) throws ElementNotFound {
         List<Title> results = null;
 
         results = titleRepository.findByDuration(employeeNumber, startDate,
-                (endDate.isPresent())?endDate.get():Calendar.getInstance().getTime());
+                (endDate.isPresent()) ? endDate.get() : Calendar.getInstance().getTime());
 
         if (results == null)
             results = Collections.<Title>emptyList();
@@ -60,7 +60,7 @@ public class TitleController {
         return results;
     }
 
-    @RequestMapping(method=RequestMethod.POST, value="/titles")
+    @RequestMapping(method = RequestMethod.POST, value = "/{employeeNumber}/titles")
     public Title.TitlePK save(HttpServletRequest request) {
         Title titleModel = new Title();
         titleRepository.save(titleModel);
@@ -68,7 +68,7 @@ public class TitleController {
         return titleModel.getId();
     }
 
-    @RequestMapping(method=RequestMethod.PUT, value="/titles/{id}")
+    @RequestMapping(method = RequestMethod.PUT, value = "/{employeeNumber}/titles/{title:[a-zA-Z 0-9]*}")
     public Title update(@PathVariable Title.TitlePK id, @RequestBody Title incomingReq) {
         Title tmpTitle = titleRepository.findOne(id);
 
@@ -78,11 +78,12 @@ public class TitleController {
         return tmpTitle;
     }
 
-    @RequestMapping(method=RequestMethod.DELETE, value="/titles/{id}")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{employeeNumber}/titles/{title:[a-zA-Z 0-9]*}")
     public String delete(@PathVariable Title.TitlePK id) {
         Title req = titleRepository.findOne(id);
         titleRepository.delete(req);
 
         return "request deleted";
     }
+
 }

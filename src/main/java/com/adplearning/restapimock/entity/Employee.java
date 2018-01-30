@@ -1,20 +1,32 @@
-package com.adplearning.restapimock.model;
+package com.adplearning.restapimock.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.hateoas.ResourceSupport;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-
-
 import javax.persistence.*;
 
 
 @Entity
 @Table(name = "employees")
 public class Employee implements Serializable {
+    /**
+     * create table seq_store (
+     *      seq_name varchar(255) not null,
+     *      seq_value int not null,
+     *      primary key (seq_name));
+     * */
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @TableGenerator(
+            name = "EmployeeSeqStore",
+            table = "seq_store",
+            pkColumnName = "seq_name",
+            pkColumnValue = "emp_no",
+            valueColumnName = "seq_value",
+            initialValue = 1,
+            allocationSize = 1 )
+    @GeneratedValue( strategy = GenerationType.TABLE, generator = "EmployeeSeqStore" )
     @Column(name = "emp_no")
     private Integer employeeNumber;
 
@@ -32,9 +44,6 @@ public class Employee implements Serializable {
 
     @Column(name = "hire_date")
     private Date hireDate;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "id.employeeNumber")
-    private List<Title> titles;
 
     public Employee() {
     }
@@ -87,11 +96,4 @@ public class Employee implements Serializable {
         this.hireDate = hireDate;
     }
 
-    public List<Title> getTitles() {
-        return titles;
-    }
-
-    public void setTitles(List<Title> titles) {
-        this.titles = titles;
-    }
 }
