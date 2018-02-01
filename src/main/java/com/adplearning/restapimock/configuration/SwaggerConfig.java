@@ -11,6 +11,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Optional;
+
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
@@ -20,6 +22,7 @@ public class SwaggerConfig {
                 .select()
                 .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
                 .paths(PathSelectors.any())
-                .build();
+                .build()
+                .genericModelSubstitutes(Optional.class);
     }
 }

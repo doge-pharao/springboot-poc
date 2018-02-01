@@ -1,5 +1,7 @@
 package com.adplearning.restapimock.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -11,6 +13,7 @@ public class Title implements Serializable {
     @EmbeddedId
     private TitlePK id;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "to_date", nullable = false)
     private Date endDate;
 
@@ -35,6 +38,7 @@ public class Title implements Serializable {
         @Column(name = "title", nullable = false)
         private String title;
 
+        @JsonFormat(pattern="yyyy-MM-dd")
         @Column(name = "from_date", nullable = false)
         private Date startDate;
 

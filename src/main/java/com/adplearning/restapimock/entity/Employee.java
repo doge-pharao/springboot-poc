@@ -1,5 +1,6 @@
 package com.adplearning.restapimock.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.io.Serializable;
@@ -30,6 +31,7 @@ public class Employee implements Serializable {
     @Column(name = "emp_no")
     private Integer employeeNumber;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "birth_date")
     private Date birthDate;
 
@@ -42,6 +44,7 @@ public class Employee implements Serializable {
     @Column(name = "gender")
     private Character gender;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "hire_date")
     private Date hireDate;
 

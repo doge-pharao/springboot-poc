@@ -28,7 +28,7 @@ public class EmployeeResourceAssembler extends ResourceAssemblerSupport<Employee
         List<Resource> resources = new ArrayList<Resource>();
         for(Employee emp : employees) {
             Resource res = new Resource<Employee>(emp, linkTo(EmployeeController.class).slash(emp.getEmployeeNumber()).withSelfRel());
-            res.add(linkTo(methodOn(TitleController.class).getAllTitles(emp.getEmployeeNumber())).withRel("titles"));
+            res.add(linkTo(methodOn(TitleController.class).getAll(emp.getEmployeeNumber())).withRel("titles"));
 
             resources.add(res);
         }
@@ -38,7 +38,7 @@ public class EmployeeResourceAssembler extends ResourceAssemblerSupport<Employee
     @Override
     public Resource toResource(Employee emp) {
         Resource res = new Resource<Employee>(emp, linkTo(EmployeeController.class).slash(emp.getEmployeeNumber()).withSelfRel());
-        res.add(linkTo(methodOn(TitleController.class).getAllTitles(emp.getEmployeeNumber())).withRel("titles"));
+        res.add(linkTo(methodOn(TitleController.class).getAll(emp.getEmployeeNumber())).withRel("titles"));
 
         return res;
     }

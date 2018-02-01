@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,14 +33,33 @@ public class EmployeeController {
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
-    private EmployeeResourceAssembler widgetResourceAssembler;
+    private EmployeeResourceAssembler employeeResourceAssembler;
     @Autowired
     EmployeeService employeeService;
 
     @RequestMapping(method=RequestMethod.GET, value="/", produces = {"application/json"})
     public PagedResources<Employee> showAll(Pageable pageable, PagedResourcesAssembler assembler) throws ElementNotFound {
         Page<Employee> employees = employeeRepository.findAll(pageable);
-        return assembler.toResource(employees, widgetResourceAssembler);
+        return assembler.toResource(employees, employeeResourceAssembler);
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/{id}")
+    public Resource<Employee> showById(@PathVariable Integer id) throws ElementNotFound {
+        Resource<Employee> result;
+        Employee employee;
+
+        if ((employee = employeeRepository.findOne(id)) == null)
+            throw new ElementNotFound();
+        else
+            result = new Resource(employee);
+
+        List<Title> methodLinkBuilder =
+                methodOn(TitleController.class).getAll(id);
+        Link titlesLink = linkTo(methodLinkBuilder).withRel("titles");
+
+        result.add(titlesLink);
+
+        return result;
     }
 
     @RequestMapping(method= RequestMethod.POST, value="/")
@@ -48,7 +68,7 @@ public class EmployeeController {
         return newEmployee.getEmployeeNumber();
     }
 
-    @RequestMapping(method= RequestMethod.PUT, value="/employees/{id}")
+    @RequestMapping(method= RequestMethod.PUT, value="/{id}")
     public Integer update(@RequestBody Employee updatedEmployee, @PathVariable Integer id) throws ElementNotFound {
         Employee result;
 
@@ -60,30 +80,15 @@ public class EmployeeController {
         return updatedEmployee.getEmployeeNumber();
     }
 
-    @RequestMapping(method=RequestMethod.GET, value="/{id}")
-    public EmployeeResource showById(@PathVariable Integer id) throws ElementNotFound {
-        EmployeeResource result;
-        Employee employee = employeeRepository.findOne(id);
-
-        if (employee != null)
-            throw new ElementNotFound();
-        else
-            result = new EmployeeResource(employee);
-
-        List<Title> methodLinkBuilder =
-                methodOn(TitleController.class).getAllTitles(id);
-        Link titlesLink = linkTo(methodLinkBuilder).withRel("titles");
-
-        result.add(titlesLink);
-
-        return result;
-    }
-
     @RequestMapping(method=RequestMethod.DELETE, value="/employees/{id}")
-    public String delete(@PathVariable Integer id) {
-        Employee req = employeeRepository.findOne(id);
-        employeeRepository.delete(req);
+    public String delete(@PathVariable Integer id) throws ElementNotFound {
+        Employee emp = employeeRepository.findOne(id);
 
-        return "request deleted";
+        if ((emp = employeeRepository.findOne(id)) == null)
+            throw new ElementNotFound();
+
+        employeeRepository.delete(emp);
+
+        return "Employee deleted";
     }
 }
